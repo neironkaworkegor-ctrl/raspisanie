@@ -2,7 +2,13 @@ name: Update RUC schedule and publish
 on:
   schedule:
     - cron: '17,47 * * * *'
+    - cron: '23 0 * * *'
   workflow_dispatch:
+    inputs:
+      full:
+        description: 'Обновить все 12 недель (дольше обычного)'
+        type: boolean
+        default: true
   push:
     branches: [main]
 permissions:
@@ -15,7 +21,7 @@ concurrency:
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 150
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -27,14 +33,21 @@ jobs:
       - name: Fetch official schedule
         id: sync
         continue-on-error: true
-        run: python scripts/sync_schedule.py
+        env:
+          FULL_SYNC: ${{ github.event_name == 'workflow_dispatch' && inputs.full || github.event.schedule == '23 0 * * *' }}
+        run: |
+          if [ "$FULL_SYNC" = "true" ]; then
+            python scripts/sync_schedule.py
+          else
+            python scripts/sync_schedule.py --past-weeks 0 --future-weeks 1
+          fi
       - name: Require a usable cache
-        run: test -s data/schedule.json
+        run: test -s data/groups.json && test -d data/years
       - name: Save latest successful data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/schedule.json
+          git add data/groups.json data/schedule.json data/years/
           if ! git diff --cached --quiet; then
             git commit -m "Update official RUC schedule"
             git push
@@ -43,7 +56,8 @@ jobs:
         run: |
           mkdir -p _site/data
           cp index.html app.js _site/
-          cp data/schedule.json _site/data/
+          cp data/groups.json data/schedule.json _site/data/
+          cp -R data/years _site/data/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -54,5 +68,7 @@ jobs:
       - name: Report source outage
         if: steps.sync.outcome == 'failure'
         run: |
+          echo "::error::RUC refresh failed. Published the last successful cache."
+          exit 1
           echo "::error::RUC refresh failed. Published the last successful cache."
           exit 1
