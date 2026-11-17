@@ -12,8 +12,8 @@ main{max-width:900px;margin:auto;padding:18px clamp(14px,4vw,40px) 40px}
 header,footer,.controls,.heading,.info{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 header,footer,.heading{justify-content:space-between}
 header{border-bottom:1px solid #777;padding-bottom:14px;font-weight:bold}
-button,input,a{font:inherit}
-button,input{color:inherit;background:#2c2d29;border:1px solid #666;border-radius:6px;padding:10px;cursor:pointer}
+button,input,select,a{font:inherit}
+button,input,select{color:inherit;background:#2c2d29;border:1px solid #666;border-radius:6px;padding:10px;cursor:pointer}
 button[aria-pressed=true]{background:var(--pink);color:var(--ink);border-color:var(--pink)}
 button:disabled{opacity:.35;cursor:default}
 :focus-visible{outline:3px solid var(--pink);outline-offset:3px}
@@ -24,18 +24,35 @@ h1{font:1000 clamp(48px,12vw,108px)/.85 "Arial Black",Arial,sans-serif;letter-sp
 .controls{margin:16px 0}.controls label{display:flex;align-items:center;gap:8px}
 nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}nav button{padding:8px 0;font-size:13px}nav b{display:block;font-size:21px}
 h2{font-size:clamp(23px,4vw,34px);letter-spacing:-.05em;margin:22px 0 8px}
-article{display:grid;grid-template-columns:52px 1fr;gap:12px;margin:8px 0;background:var(--paper);color:var(--ink);padding:16px;border-radius:4px}
+article{display:grid;grid-template-columns:52px minmax(0,1fr) 104px;gap:12px;margin:8px 0;background:var(--paper);color:var(--ink);padding:16px;border-radius:4px}
 .number{font:bold 36px/1 Arial;color:#794768}.number small{display:block;font:12px Arial}
 h3{margin:0 0 6px;font-size:clamp(18px,3vw,24px);line-height:1.12}
 .info{font-size:14px;margin-top:8px;gap:6px}.tag{background:#eed8e7;padding:3px 7px;border-radius:3px}
 footer{margin-top:24px;border-top:1px solid #777;padding-top:14px;font-size:13px;color:#ddd}a{color:var(--pink)}
-@media(max-width:440px){main{padding-inline:12px}.controls{gap:6px}.controls label{font-size:14px}article{grid-template-columns:34px 1fr;padding:13px}}
+@media(max-width:440px){main{padding-inline:12px}.controls{gap:6px}.controls label{font-size:14px}article{grid-template-columns:34px minmax(0,1fr) 76px;padding:13px}}
+
+.group-picker{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;margin:20px 0}
+.group-picker label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--pink);min-width:0}
+.group-picker input,.group-picker select{width:100%;min-width:0;color:var(--paper);font-size:16px}
+.group-field{grid-column:1/-1}
+#preference-status{grid-column:1/-1;margin:0;color:#ccc;font-size:12px}
+.lesson-time{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-left:2px solid #e5c6dc;color:#794768;font-weight:800;font-size:21px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lesson-time span{font-size:10px;letter-spacing:.09em;font-weight:400}
+.lesson-time .time-divider{width:22px;height:2px;background:#a05188;margin:0}
+.lesson-content{min-width:0;overflow-wrap:anywhere}
+@media(max-width:440px){.group-picker{grid-template-columns:125px minmax(0,1fr)}.lesson-time{font-size:17px}article{gap:8px}.number{font-size:30px}}
 </style>
 </head>
 <body>
 <main>
 <header><span>СКИ РУК / Саранск</span><button id="refresh">Обновить ↻</button></header>
-<section class="hero"><h1>ЧТО ПО<br>ПАРАМ?</h1><p>Юриспруденция · ЮР(ЮР)2-О/Бп/СР25</p></section>
+<section class="hero"><h1>ЧТО ПО<br>ПАРАМ?</h1><p id="group-title">ЮР(ЮР)2-О/Бп/СР25</p></section>
+<section class="group-picker" aria-label="Выбор группы">
+<label>Год набора<select id="year" aria-label="Год набора"><option>Загружаем…</option></select></label>
+<label>Поиск группы<input id="group-search" type="search" placeholder="Например, ЮР или ИСП" autocomplete="off"></label>
+<label class="group-field">Моя группа<select id="group" aria-label="Моя группа"><option>Загружаем…</option></select></label>
+<p id="preference-status" role="status">Выбор сохраняется на этом устройстве.</p>
+</section>
 <div class="controls">
 <button id="prev" aria-label="Предыдущая неделя">←</button>
 <label>Дата <input id="date" type="date"></label>
@@ -47,6 +64,6 @@ footer{margin-top:24px;border-top:1px solid #777;padding-top:14px;font-size:13px
 <noscript>Для просмотра расписания включи JavaScript.</noscript>
 <footer><span id="source"></span><a href="https://schedule.ruc.su/" target="_blank" rel="noopener">Сверить с РУК ↗</a></footer>
 </main>
-<script src="app.js" defer></script>
+<script src="app.js?v=2" defer></script>
 </body>
 </html>
