@@ -138,6 +138,7 @@ function render() {
         }
     }
     get('date').value = iso(selected);
+    get('date-display').textContent = iso(selected).split('-').reverse().join('.');
     get('prev').disabled = !groupId || (dates.length > 0 && monday <= Date.parse(dates[0]));
     get('next').disabled = !groupId || (dates.length > 0 && monday + 7 * DAY_MS > Date.parse(dates.at(-1)));
     get('date').min = dates[0] || '';
